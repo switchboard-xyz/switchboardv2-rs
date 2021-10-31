@@ -20,12 +20,6 @@ pub struct BorshDecimal {
     pub scale: u32,
 }
 
-impl From<SwitchboardDecimal> for Decimal {
-    fn from(item: SwitchboardDecimal) -> Self {
-        Decimal::from_i128_with_scale(item.mantissa, item.scale)
-    }
-}
-
 impl SwitchboardDecimal {
     pub fn new(mantissa: i128, scale: u32) -> SwitchboardDecimal {
         Self { mantissa, scale }
@@ -37,7 +31,7 @@ impl SwitchboardDecimal {
 
 impl TryInto<Decimal> for &SwitchboardDecimal {
     type Error = ProgramError;
-    fn try_into(self) -> core::result::Result<Decimal, ProgramError> {
+    fn try_into(self) -> Result<Decimal, ProgramError> {
         Decimal::try_from_i128_with_scale(self.mantissa, self.scale)
             .map_err(|_| ProgramError::from(SwitchboardError::DecimalConversionError))
     }
@@ -97,42 +91,26 @@ impl PartialOrd for SwitchboardDecimal {
     }
 }
 
-impl From<SwitchboardDecimal> for bool {
-    fn from(s: SwitchboardDecimal) -> Self {
-        let dec: Decimal = s.into();
+impl From<&SwitchboardDecimal> for bool {
+    fn from(s: &SwitchboardDecimal) -> Self {
+        let dec: Decimal = s.try_into().unwrap();
         dec.round().mantissa() != 0
     }
 }
 
-impl From<u64> for SwitchboardDecimal {
-    fn from(v: u64) -> Self {
-        SwitchboardDecimal {
-            mantissa: v as i128,
-            scale: 0,
-        }
-    }
-}
 impl TryInto<u64> for &SwitchboardDecimal {
     type Error = ProgramError;
     fn try_into(self) -> Result<u64, ProgramError> {
-        let dec: Decimal = self.clone().into();
+        let dec: Decimal = self.try_into().unwrap();
         dec.to_u64()
             .ok_or(ProgramError::from(SwitchboardError::IntegerOverflowError))
     }
 }
 
-impl From<i64> for SwitchboardDecimal {
-    fn from(v: i64) -> Self {
-        SwitchboardDecimal {
-            mantissa: v as i128,
-            scale: 0,
-        }
-    }
-}
 impl TryInto<i64> for &SwitchboardDecimal {
     type Error = ProgramError;
     fn try_into(self) -> Result<i64, ProgramError> {
-        let dec: Decimal = self.clone().into();
+        let dec: Decimal = self.try_into().unwrap();
         dec.to_i64()
             .ok_or(ProgramError::from(SwitchboardError::IntegerOverflowError))
     }
@@ -141,7 +119,7 @@ impl TryInto<i64> for &SwitchboardDecimal {
 impl TryInto<f64> for &SwitchboardDecimal {
     type Error = ProgramError;
     fn try_into(self) -> Result<f64, ProgramError> {
-        let dec: Decimal = self.clone().into();
+        let dec: Decimal = self.try_into().unwrap();
         dec.to_f64()
             .ok_or(ProgramError::from(SwitchboardError::IntegerOverflowError))
     }
@@ -153,18 +131,18 @@ mod tests {
 
     #[test]
     fn switchboard_decimal_into_rust_decimal() {
-        let swb_decimal = SwitchboardDecimal {
+        let swb_decimal = &SwitchboardDecimal {
             mantissa: 12345,
             scale: 2,
         };
-        let decimal = Decimal::from(swb_decimal);
+        let decimal: Decimal = swb_decimal.try_into().unwrap();
         assert_eq!(decimal.mantissa(), 12345);
         assert_eq!(decimal.scale(), 2);
     }
 
     #[test]
     fn empty_switchboard_decimal_is_false() {
-        let swb_decimal = SwitchboardDecimal {
+        let swb_decimal = &SwitchboardDecimal {
             mantissa: 0,
             scale: 0,
         };
