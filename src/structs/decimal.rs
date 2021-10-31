@@ -14,13 +14,6 @@ pub struct SwitchboardDecimal {
     pub scale: u32,
 }
 
-#[zero_copy]
-#[derive(Default, Eq, PartialEq, AnchorDeserialize)]
-pub struct BorshDecimal {
-    pub mantissa: i128,
-    pub scale: u32,
-}
-
 impl SwitchboardDecimal {
     pub fn new(mantissa: i128, scale: u32) -> SwitchboardDecimal {
         Self { mantissa, scale }
@@ -39,24 +32,6 @@ impl TryInto<Decimal> for &SwitchboardDecimal {
     fn try_into(self) -> Result<Decimal, ProgramError> {
         Decimal::try_from_i128_with_scale(self.mantissa, self.scale)
             .map_err(|_| ProgramError::from(SwitchboardError::DecimalConversionError))
-    }
-}
-
-impl From<SwitchboardDecimal> for BorshDecimal {
-    fn from(s: SwitchboardDecimal) -> Self {
-        Self {
-            mantissa: s.mantissa,
-            scale: s.scale,
-        }
-    }
-}
-
-impl Into<SwitchboardDecimal> for BorshDecimal {
-    fn into(self) -> SwitchboardDecimal {
-        SwitchboardDecimal {
-            mantissa: self.mantissa,
-            scale: self.scale,
-        }
     }
 }
 
