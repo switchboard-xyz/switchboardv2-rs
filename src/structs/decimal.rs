@@ -1,5 +1,5 @@
 use super::error::SwitchboardError;
-use anchor_lang::{zero_copy, AnchorDeserialize, AnchorSerialize};
+use anchor_lang::{zero_copy, AnchorDeserialize};
 use core::cmp::Ordering;
 use core::result::Result;
 use rust_decimal::prelude::ToPrimitive;
@@ -14,7 +14,8 @@ pub struct SwitchboardDecimal {
     pub scale: u32,
 }
 
-#[derive(Default, Eq, PartialEq, Copy, Clone, AnchorSerialize, AnchorDeserialize)]
+#[zero_copy]
+#[derive(Default, Eq, PartialEq, AnchorDeserialize)]
 pub struct BorshDecimal {
     pub mantissa: i128,
     pub scale: u32,
