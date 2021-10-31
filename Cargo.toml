@@ -13,11 +13,8 @@ documentation = "https://docs.rs/switchboard-program/"
 
 [dependencies]
 anchor-lang = "0.18.0"
+borsh = { version = "0.9.1", features = ["const-generics"] }
 solana-program = "1.7.9"
-serde-big-array  = { version = "0.3.2", features = ["const-generics"] }
-serde_derive = "*"
-serde_json = "*"
-serde = { version = "1.0", features = ["derive"] }
 # switchboard-program = "0.1.*"
 # switchboard-utils = "0.1.*"
 # switchboard-protos = "0.1.*"

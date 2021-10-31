@@ -1,11 +1,8 @@
-#[macro_use]
-extern crate serde_derive;
-
 pub mod structs;
-pub use structs::{AggregatorRound, AggregatorState, SwitchboardAccountType, SwitchboardDecimal};
-
+use anchor_lang::{zero_copy, AnchorDeserialize, AnchorSerialize};
 use solana_program::account_info::AccountInfo;
 use solana_program::program_error::ProgramError;
+pub use structs::{AggregatorRound, AggregatorState, SwitchboardAccountType, SwitchboardDecimal};
 
 /// Returns whether the current open round is considered valid for usage.
 pub fn is_current_round_valid(aggregator: &AggregatorState) -> Result<bool, ProgramError> {
@@ -31,7 +28,8 @@ pub fn get_aggregator(switchboard_feed: &AccountInfo) -> Result<AggregatorState,
     if state_buffer.len() == 0 || state_buffer[0] != SwitchboardAccountType::TYPE_AGGREGATOR as u8 {
         return Err(ProgramError::InvalidAccountData);
     }
-    let aggregator_state: AggregatorState = serde_json::from_slice(&state_buffer).unwrap();
+    let aggregator_state: AggregatorState =
+        AnchorDeserialize::try_from_slice(&state_buffer).unwrap();
     Ok(aggregator_state)
 }
 

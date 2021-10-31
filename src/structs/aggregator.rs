@@ -1,11 +1,10 @@
 use super::common::Hash;
 use super::decimal::SwitchboardDecimal;
-use anchor_lang::zero_copy;
-use serde_big_array::BigArray;
+use anchor_lang::{zero_copy, AnchorDeserialize, AnchorSerialize};
 use solana_program::pubkey::Pubkey;
 
 #[zero_copy]
-#[derive(Serialize, Deserialize, Default, Debug, PartialEq, Eq)]
+#[derive(AnchorDeserialize, AnchorSerialize, Default, Debug, PartialEq, Eq)]
 pub struct AggregatorRound {
     // Maintains the number of successful responses received from nodes.
     // Nodes can submit one successful response per round.
@@ -45,10 +44,9 @@ impl Default for AggregatorState {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[derive(AnchorDeserialize, AnchorSerialize, Debug, PartialEq, Clone)]
 pub struct AggregatorState {
     pub name: Option<[u8; 32]>,
-    #[serde(with = "BigArray")]
     pub metadata: [u8; 128],
     pub author_wallet: Option<Pubkey>,
     pub queue_pubkey: Option<Pubkey>,
@@ -79,6 +77,5 @@ pub struct AggregatorState {
     pub jobs_checksum: Option<[u8; 32]>,
     //
     pub authority: Option<Pubkey>,
-    #[serde(with = "BigArray")]
     pub _ebuf: [u8; 224], // Buffer for future info
 }
