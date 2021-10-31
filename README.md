@@ -1,6 +1,6 @@
 # switchboard-aggregator
 
-A Rust library to interact with Switchboard's hosted data feeds.
+A Rust library to interact with Switchboard V2's hosted data feeds.
 
 ## Description
 
