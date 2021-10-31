@@ -47,6 +47,7 @@ pub fn get_aggregator_result(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rust_decimal::prelude::*;
 
     pub fn create_aggregator(
         current_round: AggregatorRound,
@@ -148,5 +149,16 @@ mod tests {
             get_aggregator_result(&aggregator).unwrap(),
             current_round.clone()
         );
+    }
+
+    #[test]
+    fn switchboard_decimal_into_rust_decimal() {
+        let swb_decimal = SwitchboardDecimal {
+            mantissa: 12345,
+            scale: Some(2),
+        };
+        let decimal = Decimal::from(swb_decimal);
+        assert_eq!(decimal.mantissa(), 12345);
+        assert_eq!(decimal.scale(), 2);
     }
 }
