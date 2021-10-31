@@ -1,10 +1,10 @@
 use super::common::Hash;
 use super::decimal::SwitchboardDecimal;
-use anchor_lang::{zero_copy, AnchorDeserialize, AnchorSerialize};
+use anchor_lang::{zero_copy, AnchorDeserialize};
 use solana_program::pubkey::Pubkey;
 
 #[zero_copy]
-#[derive(AnchorDeserialize, AnchorSerialize, Default, Debug, PartialEq, Eq)]
+#[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]
 pub struct AggregatorRound {
     // Maintains the number of successful responses received from nodes.
     // Nodes can submit one successful response per round.
@@ -44,7 +44,7 @@ impl Default for AggregatorState {
     }
 }
 
-#[derive(AnchorDeserialize, AnchorSerialize, Debug, PartialEq, Clone)]
+#[derive(AnchorDeserialize, Debug, PartialEq, Clone)]
 pub struct AggregatorState {
     pub name: Option<[u8; 32]>,
     pub metadata: [u8; 128],

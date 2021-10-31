@@ -1,5 +1,5 @@
 pub mod structs;
-use anchor_lang::{zero_copy, AnchorDeserialize, AnchorSerialize};
+use anchor_lang::AnchorDeserialize;
 use solana_program::account_info::AccountInfo;
 use solana_program::program_error::ProgramError;
 pub use structs::{AggregatorRound, AggregatorState, SwitchboardAccountType, SwitchboardDecimal};

@@ -1,7 +1,8 @@
-use anchor_lang::{zero_copy, AnchorDeserialize, AnchorSerialize};
+use anchor_lang::{zero_copy, AnchorDeserialize};
+use std::convert::From;
 
 #[zero_copy]
-#[derive(AnchorDeserialize, AnchorSerialize, Default, Eq, PartialEq, Debug)]
+#[derive(AnchorDeserialize, Default, Eq, PartialEq, Debug)]
 pub struct SwitchboardDecimal {
     pub mantissa: i128,
     pub scale: Option<u32>,
