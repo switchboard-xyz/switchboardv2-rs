@@ -2,7 +2,7 @@ use super::error::SwitchboardError;
 use anchor_lang::{zero_copy, AnchorDeserialize};
 use core::cmp::Ordering;
 use core::result::Result;
-use rust_decimal::prelude::ToPrimitive;
+use rust_decimal::prelude::{FromPrimitive, ToPrimitive};
 use rust_decimal::Decimal;
 use solana_program::program_error::ProgramError;
 use std::convert::{From, TryInto};
@@ -27,6 +27,10 @@ impl SwitchboardDecimal {
     }
     pub fn from_rust_decimal(d: Decimal) -> SwitchboardDecimal {
         Self::new(d.mantissa(), d.scale())
+    }
+    pub fn from_f64(v: f64) -> SwitchboardDecimal {
+        let dec = Decimal::from_f64(v).unwrap();
+        Self::from_rust_decimal(dec)
     }
 }
 
@@ -171,5 +175,8 @@ mod tests {
         };
         let b: f64 = swb_decimal.try_into().unwrap();
         assert_eq!(b, 1234.5678);
+
+        let swb_f64 = &SwitchboardDecimal::from_f64(1234.5678);
+        assert_eq!(swb_decimal, swb_f64);
     }
 }

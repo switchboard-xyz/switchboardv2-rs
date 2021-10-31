@@ -123,7 +123,7 @@ impl AggregatorAccountData {
 mod tests {
     use super::*;
 
-    pub fn create_aggregator(
+    fn create_aggregator(
         current_round: AggregatorRound,
         last_round: AggregatorRound,
     ) -> AggregatorAccountData {
@@ -135,44 +135,18 @@ mod tests {
         aggregator.min_oracle_results = 10;
         return aggregator;
     }
+    fn create_round(num_success: u32, num_error: u32, v: f64) -> AggregatorRound {
+        let mut result = AggregatorRound::default();
+        result.num_success = num_success;
+        result.num_error = num_error;
+        result.result = SwitchboardDecimal::from_f64(v);
+        return result;
+    }
 
     #[test]
     fn test_reject_current_on_sucess_count() {
-        let mut current_round = AggregatorRound::default();
-        current_round.num_success = 2;
-        current_round.num_error = 5;
-        current_round.result = SwitchboardDecimal {
-            mantissa: 975,
-            scale: 1,
-        };
-        current_round.round_open_slot = 1;
-        current_round.round_open_timestamp = 1;
-        current_round.min_response = SwitchboardDecimal {
-            mantissa: 961,
-            scale: 1,
-        };
-        current_round.max_response = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
-
-        let mut last_round = AggregatorRound::default();
-        last_round.num_success = 30;
-        last_round.num_error = 0;
-        last_round.result = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
-        last_round.round_open_slot = 1;
-        last_round.round_open_timestamp = 1;
-        last_round.min_response = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
-        last_round.max_response = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
+        let current_round = create_round(2, 5, 97.5);
+        let last_round = create_round(30, 0, 100.0);
 
         let aggregator = create_aggregator(current_round.clone(), last_round.clone());
         assert_eq!(aggregator.get_result().unwrap(), last_round.clone());
@@ -180,41 +154,8 @@ mod tests {
 
     #[test]
     fn test_accept_current_on_sucess_count() {
-        let mut current_round = AggregatorRound::default();
-        current_round.num_success = 20;
-        current_round.num_error = 5;
-        current_round.result = SwitchboardDecimal {
-            mantissa: 975,
-            scale: 1,
-        };
-        current_round.round_open_slot = 1;
-        current_round.round_open_timestamp = 1;
-        current_round.min_response = SwitchboardDecimal {
-            mantissa: 961,
-            scale: 1,
-        };
-        current_round.max_response = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
-
-        let mut last_round = AggregatorRound::default();
-        last_round.num_success = 30;
-        last_round.num_error = 0;
-        last_round.result = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
-        last_round.round_open_slot = 1;
-        last_round.round_open_timestamp = 1;
-        last_round.min_response = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
-        last_round.max_response = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
+        let current_round = create_round(20, 5, 97.5);
+        let last_round = create_round(30, 0, 100.0);
 
         let aggregator = create_aggregator(current_round.clone(), last_round.clone());
         assert_eq!(aggregator.get_result().unwrap(), current_round.clone());
@@ -222,41 +163,8 @@ mod tests {
 
     #[test]
     fn test_no_valid_aggregator_result() {
-        let mut current_round = AggregatorRound::default();
-        current_round.num_success = 1;
-        current_round.num_error = 5;
-        current_round.result = SwitchboardDecimal {
-            mantissa: 975,
-            scale: 1,
-        };
-        current_round.round_open_slot = 1;
-        current_round.round_open_timestamp = 1;
-        current_round.min_response = SwitchboardDecimal {
-            mantissa: 961,
-            scale: 1,
-        };
-        current_round.max_response = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
-
-        let mut last_round = AggregatorRound::default();
-        last_round.num_success = 1;
-        last_round.num_error = 0;
-        last_round.result = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
-        last_round.round_open_slot = 1;
-        last_round.round_open_timestamp = 1;
-        last_round.min_response = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
-        last_round.max_response = SwitchboardDecimal {
-            mantissa: 100,
-            scale: 0,
-        };
+        let current_round = create_round(1, 5, 97.5);
+        let last_round = create_round(1, 5, 100.0);
 
         let aggregator = create_aggregator(current_round.clone(), last_round.clone());
         assert_eq!(
