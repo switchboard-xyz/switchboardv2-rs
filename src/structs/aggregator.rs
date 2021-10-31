@@ -47,7 +47,7 @@ impl Default for AggregatorState {
 #[derive(AnchorDeserialize, Debug, PartialEq, Clone)]
 pub struct AggregatorState {
     pub name: Option<[u8; 32]>,
-    pub metadata: [u8; 128],
+    pub metadata: Option<[u8; 128]>,
     pub author_wallet: Option<Pubkey>,
     pub queue_pubkey: Option<Pubkey>,
     // CONFIGS
@@ -77,5 +77,5 @@ pub struct AggregatorState {
     pub jobs_checksum: Option<[u8; 32]>,
     //
     pub authority: Option<Pubkey>,
-    pub _ebuf: [u8; 224], // Buffer for future info
+    pub _ebuf: Option<[u8; 224]>, // Buffer for future info
 }
