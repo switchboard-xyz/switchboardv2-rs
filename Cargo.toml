@@ -14,8 +14,9 @@ documentation = "https://docs.rs/switchboard-program/"
 [dependencies]
 anchor-lang = "0.18.0"
 borsh = { version = "0.9.1", features = ["const-generics"] }
-rust_decimal = "1.17"
+rust_decimal = { version = "1.15.0" }
 solana-program = "1.7.9"
+thiserror = "1.0.30"
 # switchboard-program = "0.1.*"
 # switchboard-utils = "0.1.*"
 # switchboard-protos = "0.1.*"
