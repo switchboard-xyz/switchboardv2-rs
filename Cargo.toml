@@ -2,12 +2,13 @@
 name = "switchboard-aggregator"
 version = "0.1.0"
 edition = "2021"
-description = "A Rust library to interact with Switchboard data feeds."
+description = "A Rust library to interact with Switchboard V2 data feeds."
 readme = "README.md"
 keywords = ["switchboard", "oracle", "solana"]
 homepage = "https://switchboard.xyz"
+repository = "https://github.com/gallynaut/switchboard-aggregator"
 license = "MIT"
-documentation = "https://docs.rs/switchboard-program/"
+documentation = "https://docs.rs/switchboard-aggregator/"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,8 +16,5 @@ documentation = "https://docs.rs/switchboard-program/"
 anchor-lang = "0.18.0"
 borsh = { version = "0.9.1", features = ["const-generics"] }
 rust_decimal = { version = "1.15.0" }
-solana-program = "1.7.9"
+solana-program = "1.8.2"
 thiserror = "1.0.30"
-# switchboard-program = "0.1.*"
-# switchboard-utils = "0.1.*"
-# switchboard-protos = "0.1.*"
