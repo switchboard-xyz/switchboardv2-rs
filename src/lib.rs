@@ -14,5 +14,3 @@ pub fn get_aggregator_result(
     let aggregator = AggregatorAccountData::new(switchboard_feed)?;
     aggregator.get_result()
 }
-
-

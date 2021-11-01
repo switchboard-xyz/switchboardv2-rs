@@ -1,4 +1,4 @@
-use anchor_lang::{zero_copy, AnchorDeserialize};
+use anchor_lang::prelude::*;
 
 #[zero_copy]
 #[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]

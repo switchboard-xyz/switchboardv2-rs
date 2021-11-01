@@ -1,9 +1,10 @@
+#[allow(unaligned_references)]
 use super::common::Hash;
 use super::decimal::SwitchboardDecimal;
 use super::error::SwitchboardError;
+use anchor_lang::prelude::*;
 use anchor_lang::AnchorDeserialize;
 
-use anchor_lang::prelude::*;
 use solana_program::pubkey::Pubkey;
 
 #[zero_copy]
@@ -41,11 +42,11 @@ pub struct AggregatorRound {
     pub errors_fulfilled: [bool; 16],
 }
 impl AggregatorRound {
-    pub fn is_round_valid(&self, min_oracle_results: u32) -> Result<bool, ProgramError> {
-        if self.num_success < min_oracle_results {
-            return Ok(false);
+    pub fn is_round_valid(&self, min_oracle_results: u32) -> bool {
+        if self.num_success >= min_oracle_results {
+            return true;
         }
-        Ok(true)
+        false
     }
 }
 
@@ -100,18 +101,13 @@ impl AggregatorAccountData {
         Ok(aggregator)
     }
 
-    pub fn is_current_round_valid(&self) -> Result<bool, ProgramError> {
-        let round = self.current_round.clone();
-        round.is_round_valid(self.min_oracle_results)
-    }
-    pub fn is_latest_confirmed_round_valid(&self) -> Result<bool, ProgramError> {
-        let round = self.latest_confirmed_round.clone();
-        round.is_round_valid(self.min_oracle_results)
-    }
     pub fn get_result(&self) -> Result<AggregatorRound, ProgramError> {
-        if self.is_current_round_valid().unwrap() {
+        if self.current_round.is_round_valid(self.min_oracle_results) {
             Ok(self.current_round)
-        } else if self.is_latest_confirmed_round_valid().unwrap() {
+        } else if self
+            .latest_confirmed_round
+            .is_round_valid(self.min_oracle_results)
+        {
             Ok(self.latest_confirmed_round)
         } else {
             Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound))

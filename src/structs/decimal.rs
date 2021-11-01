@@ -1,5 +1,5 @@
 use super::error::SwitchboardError;
-use anchor_lang::{zero_copy, AnchorDeserialize};
+use anchor_lang::prelude::*;
 use core::cmp::Ordering;
 use core::result::Result;
 use rust_decimal::prelude::{FromPrimitive, ToPrimitive};
