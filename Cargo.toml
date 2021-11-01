@@ -16,5 +16,5 @@ documentation = "https://docs.rs/switchboard-aggregator/"
 anchor-lang = "0.18.0"
 borsh = { version = "0.9.1", features = ["const-generics"] }
 rust_decimal = { version = "1.15.0" }
-solana-program = "1.7.9"
+solana-program = "1.8.2"
 thiserror = "1.0.30"
