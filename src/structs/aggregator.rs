@@ -50,7 +50,7 @@ impl AggregatorRound {
     }
 }
 
-#[account(zero_copy)]
+#[zero_copy]
 #[derive(AnchorDeserialize, Debug, PartialEq)]
 pub struct AggregatorAccountData {
     pub name: [u8; 32],
