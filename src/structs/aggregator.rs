@@ -50,7 +50,7 @@ impl AggregatorRound {
     }
 }
 
-#[zero_copy]
+#[account(zero_copy)]
 #[derive(AnchorDeserialize, Debug, PartialEq)]
 pub struct AggregatorAccountData {
     pub name: [u8; 32],
@@ -88,13 +88,6 @@ pub struct AggregatorAccountData {
 }
 
 impl AggregatorAccountData {
-    pub fn new(switchboard_feed: &AccountInfo) -> Result<AggregatorAccountData, ProgramError> {
-        let aggregator_account_loader =
-            Loader::<AggregatorAccountData>::new(switchboard_feed);
-        let aggregator: AggregatorAccountData = *aggregator_account_loader.load()?;
-        Ok(aggregator)
-    }
-
     pub fn get_result(&self) -> Result<AggregatorRound, ProgramError> {
         if self.current_round.is_round_valid(self.min_oracle_results) {
             Ok(self.current_round)
