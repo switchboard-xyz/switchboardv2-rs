@@ -90,7 +90,7 @@ pub struct AggregatorAccountData {
 impl AggregatorAccountData {
     pub fn new(switchboard_feed: &AccountInfo) -> Result<AggregatorAccountData, ProgramError> {
         let aggregator_account_loader =
-            AccountLoader::<AggregatorAccountData>::try_from(switchboard_feed)?;
+            Loader::<AggregatorAccountData>::new(switchboard_feed);
         let aggregator: AggregatorAccountData = *aggregator_account_loader.load()?;
         Ok(aggregator)
     }
