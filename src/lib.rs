@@ -8,6 +8,7 @@ pub use structs::{AggregatorAccountData, SwitchboardDecimal, SwitchboardError};
 
 declare_id!("3TSYZ3oXt9e42TdXFuYVaQyLP5ZX3fWtMhaQReHPau44");
 
+const SWITCHBOARD_MAINNET_PID: &str = "5n43jDh58UzjqGE2sFuZPrkgx52BT6PWgcdL1CvBU9Ww";
 const SWITCHBOARD_DEVNET_PID: &str = "5n43jDh58UzjqGE2sFuZPrkgx52BT6PWgcdL1CvBU9Ww";
 
 pub fn get_aggregator_result_devnet(
@@ -16,8 +17,6 @@ pub fn get_aggregator_result_devnet(
     let pid = Pubkey::from_str(&SWITCHBOARD_DEVNET_PID).unwrap();
     get_aggregator_result(switchboard_feed, &pid)
 }
-
-const SWITCHBOARD_MAINNET_PID: &str = "5n43jDh58UzjqGE2sFuZPrkgx52BT6PWgcdL1CvBU9Ww";
 
 pub fn get_aggregator_result_mainnet(
     switchboard_feed: &AccountInfo,
