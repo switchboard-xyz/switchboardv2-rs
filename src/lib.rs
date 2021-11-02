@@ -7,7 +7,7 @@ use std::convert::TryInto;
 use std::str::FromStr;
 pub use structs::{AggregatorAccountData, AggregatorRound, SwitchboardDecimal};
 
-declare_id!("3TSYZ3oXt9e42TdXFuYVaQyLP5ZX3fWtMhaQReHPau5f");
+declare_id!("3TSYZ3oXt9e42TdXFuYVaQyLP5ZX3fWtMhaQReHPau44");
 
 const SWITCHBOARD_DEVNET_PID: &str = "5n43jDh58UzjqGE2sFuZPrkgx52BT6PWgcdL1CvBU9Ww";
 
