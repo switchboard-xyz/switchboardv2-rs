@@ -3,7 +3,6 @@ use solana_program::account_info::AccountInfo;
 use solana_program::program_error::ProgramError;
 pub use structs::{AggregatorAccountData, AggregatorRound, SwitchboardDecimal};
 
-anchor_lang::declare_id!("GFerzWEGnbUn4ZvjVqdKhasNSFU16BkbYB1eUqxHMtDA");
 
 /// Given a Switchboard data feed account, this method will parse the account state.
 ///
@@ -16,5 +15,5 @@ pub fn get_aggregator_result(
     // let aggregator = AggregatorAccountData::new(switchboard_feed)?;
     // msg!("a");
     // aggregator.get_result()
-    0
+    Ok(0)
 }
