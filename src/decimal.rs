@@ -31,7 +31,7 @@ impl TryInto<Decimal> for &SwitchboardDecimal {
     type Error = ProgramError;
     fn try_into(self) -> Result<Decimal, ProgramError> {
         Decimal::try_from_i128_with_scale(self.mantissa, self.scale)
-            .map_err(|_| ProgramError::from(SwitchboardError::DecimalConversionError))
+            .map_err(|_| SwitchboardError::DecimalConversionError.into())
     }
 }
 
@@ -83,7 +83,7 @@ impl TryInto<u64> for &SwitchboardDecimal {
     fn try_into(self) -> Result<u64, ProgramError> {
         let dec: Decimal = self.try_into().unwrap();
         dec.to_u64()
-            .ok_or(ProgramError::from(SwitchboardError::IntegerOverflowError))
+            .ok_or(SwitchboardError::IntegerOverflowError.into())
     }
 }
 
@@ -92,7 +92,7 @@ impl TryInto<i64> for &SwitchboardDecimal {
     fn try_into(self) -> Result<i64, ProgramError> {
         let dec: Decimal = self.try_into().unwrap();
         dec.to_i64()
-            .ok_or(ProgramError::from(SwitchboardError::IntegerOverflowError))
+            .ok_or(SwitchboardError::IntegerOverflowError.into())
     }
 }
 
@@ -101,7 +101,7 @@ impl TryInto<f64> for &SwitchboardDecimal {
     fn try_into(self) -> Result<f64, ProgramError> {
         let dec: Decimal = self.try_into().unwrap();
         dec.to_f64()
-            .ok_or(ProgramError::from(SwitchboardError::IntegerOverflowError))
+            .ok_or(SwitchboardError::IntegerOverflowError.into())
     }
 }
 
