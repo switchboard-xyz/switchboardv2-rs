@@ -4,7 +4,6 @@ use super::error::SwitchboardError;
 use anchor_lang::prelude::*;
 use anchor_lang::AnchorDeserialize;
 use solana_program::pubkey::Pubkey;
-use std::cell::Ref;
 
 #[zero_copy]
 #[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]
@@ -95,7 +94,7 @@ impl AggregatorAccountData {
         //     return Err(SwitchboardError::AccountDiscriminatorMismatch.into());
         // }
 
-        let aggregator = Ref::map(data, |data| bytemuck::from_bytes(&data[8..]));
+        let aggregator: &AggregatorAccountData = bytemuck::from_bytes(&data[8..]);
         Ok(*aggregator)
     }
 
