@@ -136,6 +136,8 @@ mod tests {
         return result;
     }
 
+    // need to add test to check for incorrect discriminator
+
     #[test]
     fn test_accept_current_on_sucess_count() {
         let lastest_round = create_round(100.0, 30, 0); // num success 30 > 10 min oracle result
