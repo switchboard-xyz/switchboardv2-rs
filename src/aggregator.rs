@@ -92,7 +92,7 @@ impl AggregatorAccountData {
         disc_bytes.copy_from_slice(&data[..8]);
         if disc_bytes != AggregatorAccountData::discriminator() {
             msg!("{:?}", disc_bytes);
-            // return Err(SwitchboardError::AccountDiscriminatorMismatch.into());
+            return Err(SwitchboardError::AccountDiscriminatorMismatch.into());
         }
 
         let aggregator = Ref::map(data, |data| bytemuck::from_bytes(&data[8..]));
@@ -107,7 +107,7 @@ impl AggregatorAccountData {
     }
 
     fn discriminator() -> [u8; 8] {
-        return [0u8; 8];
+        return [217, 230, 65, 101, 201, 162, 27, 125];
     }
 }
 
