@@ -4,6 +4,7 @@ use super::error::SwitchboardError;
 use anchor_lang::prelude::*;
 use anchor_lang::AnchorDeserialize;
 use solana_program::pubkey::Pubkey;
+use std::cell::Ref;
 
 #[zero_copy]
 #[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]
@@ -45,14 +46,6 @@ pub struct AggregatorRound {
     // could do specific error codes
     pub errors_fulfilled: [bool; 16],
 }
-impl AggregatorRound {
-    pub fn is_round_valid(&self, min_oracle_results: u32) -> bool {
-        if self.num_success >= min_oracle_results {
-            return true;
-        }
-        false
-    }
-}
 
 #[account(zero_copy)]
 #[derive(AnchorDeserialize, Debug, PartialEq)]
@@ -92,17 +85,26 @@ pub struct AggregatorAccountData {
 }
 
 impl AggregatorAccountData {
-    pub fn get_result(&self) -> Result<AggregatorRound, ProgramError> {
-        if self.current_round.is_round_valid(self.min_oracle_results) {
-            Ok(self.current_round)
-        } else if self
-            .latest_confirmed_round
-            .is_round_valid(self.min_oracle_results)
-        {
-            Ok(self.latest_confirmed_round)
-        } else {
-            Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound))
+    pub fn new(switchboard_feed: &AccountInfo) -> Result<AggregatorAccountData, ProgramError> {
+        let data = switchboard_feed.try_borrow_data()?;
+
+        // let mut disc_bytes = [0u8; 8];
+        // disc_bytes.copy_from_slice(&data[..8]);
+        // if disc_bytes != AggregatorAccountData::discriminator() {
+        //     return Err(SwitchboardError::AccountDiscriminatorMismatch.into());
+        // }
+
+        let aggregator = Ref::map(data, |data| bytemuck::from_bytes(&data[8..]));
+        Ok(*aggregator)
+    }
+    fn discriminator() -> [u8; 8] {
+        return [0u8; 8];
+    }
+    pub fn get_result(self) -> Result<SwitchboardDecimal, ProgramError> {
+        if self.min_oracle_results > self.latest_confirmed_round.num_success {
+            return Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound));
         }
+        Ok(self.latest_confirmed_round.result)
     }
 }
 

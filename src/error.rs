@@ -9,4 +9,6 @@ pub enum SwitchboardError {
     DecimalConversionError,
     #[msg("An integer overflow occurred.")]
     IntegerOverflowError,
+    #[msg("Account discriminator did not match.")]
+    AccountDiscriminatorMismatch,
 }
