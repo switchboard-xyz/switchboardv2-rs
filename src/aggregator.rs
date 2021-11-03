@@ -85,7 +85,9 @@ pub struct AggregatorAccountData {
 }
 
 impl AggregatorAccountData {
-    pub fn new(switchboard_feed: &AccountInfo) -> Result<AggregatorAccountData, ProgramError> {
+    pub fn new<'info>(
+        switchboard_feed: &'info AccountInfo,
+    ) -> Result<Ref<'info, AggregatorAccountData>, ProgramError> {
         let data = switchboard_feed.try_borrow_data()?;
 
         // let mut disc_bytes = [0u8; 8];
@@ -94,9 +96,8 @@ impl AggregatorAccountData {
         //     msg!("{:?}", disc_bytes);
         //     return Err(SwitchboardError::AccountDiscriminatorMismatch.into());
         // }
-        let aggregator: Ref<AggregatorAccountData> =
-            Ref::map(data, |data| bytemuck::from_bytes(&data[8..]));
-        Ok(*aggregator)
+
+        Ok(Ref::map(data, |data| bytemuck::from_bytes(&data[8..])))
     }
 
     pub fn get_result(self) -> Result<SwitchboardDecimal, ProgramError> {
@@ -114,7 +115,7 @@ impl AggregatorAccountData {
 #[cfg(test)]
 mod tests {
     use super::*;
-    impl Default for AggregatorAccountData {
+    impl<'info> Default for AggregatorAccountData {
         fn default() -> Self {
             unsafe { std::mem::zeroed() }
         }
