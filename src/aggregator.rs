@@ -7,13 +7,13 @@ use solana_program::pubkey::Pubkey;
 use std::cell::Ref;
 
 #[zero_copy]
-#[derive(AnchorSerialize, AnchorDeserialize, Default, Debug, PartialEq, Eq)]
+#[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]
 pub struct Hash {
     pub data: [u8; 32],
 }
 
 #[zero_copy]
-#[derive(AnchorSerialize, AnchorDeserialize, Default, Debug, PartialEq, Eq)]
+#[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]
 pub struct AggregatorRound {
     // Maintains the number of successful responses received from nodes.
     // Nodes can submit one successful response per round.
@@ -48,7 +48,7 @@ pub struct AggregatorRound {
 }
 
 #[account(zero_copy)]
-#[derive(AnchorSerialize, AnchorDeserialize, Debug, PartialEq)]
+#[derive(AnchorDeserialize, Debug, PartialEq)]
 pub struct AggregatorAccountData {
     pub name: [u8; 32],
     pub metadata: [u8; 128],

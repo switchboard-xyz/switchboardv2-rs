@@ -8,7 +8,7 @@ use solana_program::program_error::ProgramError;
 use std::convert::{From, TryInto};
 
 #[zero_copy]
-#[derive(Default, Debug, Eq, PartialEq, AnchorDeserialize, AnchorSerialize)]
+#[derive(Default, Debug, Eq, PartialEq, AnchorDeserialize)]
 pub struct SwitchboardDecimal {
     pub mantissa: i128,
     pub scale: u32,
