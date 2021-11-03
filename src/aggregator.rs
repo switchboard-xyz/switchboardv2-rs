@@ -7,13 +7,13 @@ use solana_program::pubkey::Pubkey;
 use std::cell::Ref;
 
 #[zero_copy]
-#[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Default, Debug, PartialEq, Eq)]
 pub struct Hash {
     pub data: [u8; 32],
 }
 
 #[zero_copy]
-#[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Default, Debug, PartialEq, Eq)]
 pub struct AggregatorRound {
     // Maintains the number of successful responses received from nodes.
     // Nodes can submit one successful response per round.
@@ -48,7 +48,7 @@ pub struct AggregatorRound {
 }
 
 #[account(zero_copy)]
-#[derive(AnchorDeserialize, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Debug, PartialEq)]
 pub struct AggregatorAccountData {
     pub name: [u8; 32],
     pub metadata: [u8; 128],
@@ -136,7 +136,21 @@ mod tests {
         return result;
     }
 
-    // need to add test to check for incorrect discriminator
+    // #[test]
+    // fn check_discriminator() {
+    //     let lastest_round = create_round(100.0, 30, 0);
+    //     let mut aggregator = create_aggregator(lastest_round);
+    //     aggregator.name = [
+    //         44, 75, 0x6d, 0x6d, 79, 20, 41, 67, 67, 72, 65, 67, 61, 74, 0x6f, 72, 44, 75, 0x6d,
+    //         0x6d, 79, 20, 41, 67, 67, 72, 65, 67, 61, 74, 0x6f, 72,
+    //     ]; // "Dummy AggregatorDummy Aggregator"
+    //     let vec = aggregator.try_to_vec().unwrap();
+    //     let data = vec.as_slice();
+    //     let mut disc_bytes = [0u8; 8];
+    //     disc_bytes.copy_from_slice(&data[..8]);
+
+    //     assert_eq!(disc_bytes, AggregatorAccountData::discriminator())
+    // }
 
     #[test]
     fn test_accept_current_on_sucess_count() {
