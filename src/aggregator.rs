@@ -88,11 +88,12 @@ impl AggregatorAccountData {
     pub fn new(switchboard_feed: &AccountInfo) -> Result<AggregatorAccountData, ProgramError> {
         let data = switchboard_feed.try_borrow_data()?;
 
-        // let mut disc_bytes = [0u8; 8];
-        // disc_bytes.copy_from_slice(&data[..8]);
-        // if disc_bytes != AggregatorAccountData::discriminator() {
-        //     return Err(SwitchboardError::AccountDiscriminatorMismatch.into());
-        // }
+        let mut disc_bytes = [0u8; 8];
+        disc_bytes.copy_from_slice(&data[..8]);
+        if disc_bytes != AggregatorAccountData::discriminator() {
+            msg!("{:?}", disc_bytes);
+            return Err(SwitchboardError::AccountDiscriminatorMismatch.into());
+        }
 
         let aggregator = Ref::map(data, |data| bytemuck::from_bytes(&data[8..]));
         Ok(*aggregator)
@@ -105,9 +106,9 @@ impl AggregatorAccountData {
         Ok(self.latest_confirmed_round.result)
     }
 
-    // fn discriminator() -> [u8; 8] {
-    //     return [0u8; 8];
-    // }
+    fn discriminator() -> [u8; 8] {
+        return [0u8; 8];
+    }
 }
 
 #[cfg(test)]
