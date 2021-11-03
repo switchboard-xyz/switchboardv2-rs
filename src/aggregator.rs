@@ -138,22 +138,6 @@ mod tests {
         return result;
     }
 
-    // #[test]
-    // fn check_discriminator() {
-    //     let lastest_round = create_round(100.0, 30, 0);
-    //     let mut aggregator = create_aggregator(lastest_round);
-    //     aggregator.name = [
-    //         44, 75, 0x6d, 0x6d, 79, 20, 41, 67, 67, 72, 65, 67, 61, 74, 0x6f, 72, 44, 75, 0x6d,
-    //         0x6d, 79, 20, 41, 67, 67, 72, 65, 67, 61, 74, 0x6f, 72,
-    //     ]; // "Dummy AggregatorDummy Aggregator"
-    //     let vec = aggregator.try_to_vec().unwrap();
-    //     let data = vec.as_slice();
-    //     let mut disc_bytes = [0u8; 8];
-    //     disc_bytes.copy_from_slice(&data[..8]);
-
-    //     assert_eq!(disc_bytes, AggregatorAccountData::discriminator())
-    // }
-
     #[test]
     fn test_accept_current_on_sucess_count() {
         let lastest_round = create_round(100.0, 30, 0); // num success 30 > 10 min oracle result
