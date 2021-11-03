@@ -97,68 +97,73 @@ impl AggregatorAccountData {
         let aggregator = Ref::map(data, |data| bytemuck::from_bytes(&data[8..]));
         Ok(*aggregator)
     }
-    fn discriminator() -> [u8; 8] {
-        return [0u8; 8];
-    }
+
     pub fn get_result(self) -> Result<SwitchboardDecimal, ProgramError> {
         if self.min_oracle_results > self.latest_confirmed_round.num_success {
             return Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound));
         }
         Ok(self.latest_confirmed_round.result)
     }
+
+    // fn discriminator() -> [u8; 8] {
+    //     return [0u8; 8];
+    // }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
+#[cfg(test)]
+mod tests {
+    use super::*;
+    impl Default for AggregatorAccountData {
+        fn default() -> Self {
+            unsafe { std::mem::zeroed() }
+        }
+    }
 
-//     fn create_aggregator(
-//         current_round: AggregatorRound,
-//         last_round: AggregatorRound,
-//     ) -> AggregatorAccountData {
-//         let mut aggregator = AggregatorAccountData {};
-//         aggregator.min_update_delay_seconds = 10;
-//         aggregator.latest_confirmed_round = last_round;
-//         aggregator.current_round = current_round;
-//         aggregator.min_job_results = 10;
-//         aggregator.min_oracle_results = 10;
-//         return aggregator;
-//     }
-//     fn create_round(num_success: u32, num_error: u32, v: f64) -> AggregatorRound {
-//         let mut result = AggregatorRound::default();
-//         result.num_success = num_success;
-//         result.num_error = num_error;
-//         result.result = SwitchboardDecimal::from_f64(v);
-//         return result;
-//     }
+    fn create_aggregator(lastest_round: AggregatorRound) -> AggregatorAccountData {
+        let mut aggregator = AggregatorAccountData::default();
+        aggregator.min_update_delay_seconds = 10;
+        aggregator.latest_confirmed_round = lastest_round;
+        aggregator.min_job_results = 10;
+        aggregator.min_oracle_results = 10;
+        return aggregator;
+    }
 
-//     #[test]
-//     fn test_reject_current_on_sucess_count() {
-//         let current_round = create_round(2, 5, 97.5);
-//         let last_round = create_round(30, 0, 100.0);
+    fn create_round(value: f64, num_success: u32, num_error: u32) -> AggregatorRound {
+        let mut result = AggregatorRound::default();
+        result.num_success = num_success;
+        result.num_error = num_error;
+        result.result = SwitchboardDecimal::from_f64(value);
+        return result;
+    }
 
-//         let aggregator = create_aggregator(current_round.clone(), last_round.clone());
-//         assert_eq!(aggregator.get_result().unwrap(), last_round.clone());
-//     }
+    #[test]
+    fn test_accept_current_on_sucess_count() {
+        let lastest_round = create_round(100.0, 30, 0); // num success 30 > 10 min oracle result
 
-//     #[test]
-//     fn test_accept_current_on_sucess_count() {
-//         let current_round = create_round(20, 5, 97.5);
-//         let last_round = create_round(30, 0, 100.0);
+        let aggregator = create_aggregator(lastest_round.clone());
+        assert_eq!(
+            aggregator.get_result().unwrap(),
+            lastest_round.result.clone()
+        );
+    }
 
-//         let aggregator = create_aggregator(current_round.clone(), last_round.clone());
-//         assert_eq!(aggregator.get_result().unwrap(), current_round.clone());
-//     }
+    #[test]
+    fn test_reject_current_on_sucess_count() {
+        let lastest_round = create_round(100.0, 5, 0); // num success 30 < 10 min oracle result
 
-//     #[test]
-//     fn test_no_valid_aggregator_result() {
-//         let current_round = create_round(1, 5, 97.5);
-//         let last_round = create_round(1, 5, 100.0);
+        let aggregator = create_aggregator(lastest_round.clone());
+        assert_eq!(
+            aggregator.get_result(),
+            Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound))
+        );
+    }
 
-//         let aggregator = create_aggregator(current_round.clone(), last_round.clone());
-//         assert_eq!(
-//             aggregator.get_result(),
-//             Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound))
-//         );
-//     }
-// }
+    #[test]
+    fn test_no_valid_aggregator_result() {
+        let aggregator = create_aggregator(AggregatorRound::default());
+        assert_eq!(
+            aggregator.get_result(),
+            Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound))
+        );
+    }
+}
