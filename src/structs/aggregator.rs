@@ -1,11 +1,15 @@
 #[allow(unaligned_references)]
-use super::common::Hash;
 use super::decimal::SwitchboardDecimal;
 use super::error::SwitchboardError;
 use anchor_lang::prelude::*;
 use anchor_lang::AnchorDeserialize;
-
 use solana_program::pubkey::Pubkey;
+
+#[zero_copy]
+#[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]
+pub struct Hash {
+    pub data: [u8; 32],
+}
 
 #[zero_copy]
 #[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]

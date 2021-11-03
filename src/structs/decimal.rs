@@ -128,6 +128,12 @@ mod tests {
         };
         let b: bool = swb_decimal.into();
         assert_eq!(b, false);
+        let swb_decimal_neg = &SwitchboardDecimal {
+            mantissa: -0,
+            scale: 0,
+        };
+        let b: bool = swb_decimal_neg.into();
+        assert_eq!(b, false);
     }
 
     #[test]
