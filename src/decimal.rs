@@ -26,8 +26,15 @@ impl SwitchboardDecimal {
         Self::from_rust_decimal(dec)
     }
 }
-
 impl TryInto<Decimal> for &SwitchboardDecimal {
+    type Error = ProgramError;
+    fn try_into(self) -> Result<Decimal, ProgramError> {
+        Decimal::try_from_i128_with_scale(self.mantissa, self.scale)
+            .map_err(|_| SwitchboardError::DecimalConversionError.into())
+    }
+}
+
+impl TryInto<Decimal> for SwitchboardDecimal {
     type Error = ProgramError;
     fn try_into(self) -> Result<Decimal, ProgramError> {
         Decimal::try_from_i128_with_scale(self.mantissa, self.scale)
@@ -71,35 +78,35 @@ impl PartialOrd for SwitchboardDecimal {
     }
 }
 
-impl From<&SwitchboardDecimal> for bool {
-    fn from(s: &SwitchboardDecimal) -> Self {
-        let dec: Decimal = s.try_into().unwrap();
+impl From<SwitchboardDecimal> for bool {
+    fn from(s: SwitchboardDecimal) -> Self {
+        let dec: Decimal = (&s).try_into().unwrap();
         dec.round().mantissa() != 0
     }
 }
 
-impl TryInto<u64> for &SwitchboardDecimal {
+impl TryInto<u64> for SwitchboardDecimal {
     type Error = ProgramError;
     fn try_into(self) -> Result<u64, ProgramError> {
-        let dec: Decimal = self.try_into().unwrap();
+        let dec: Decimal = (&self).try_into().unwrap();
         dec.to_u64()
             .ok_or(SwitchboardError::IntegerOverflowError.into())
     }
 }
 
-impl TryInto<i64> for &SwitchboardDecimal {
+impl TryInto<i64> for SwitchboardDecimal {
     type Error = ProgramError;
     fn try_into(self) -> Result<i64, ProgramError> {
-        let dec: Decimal = self.try_into().unwrap();
+        let dec: Decimal = (&self).try_into().unwrap();
         dec.to_i64()
             .ok_or(SwitchboardError::IntegerOverflowError.into())
     }
 }
 
-impl TryInto<f64> for &SwitchboardDecimal {
+impl TryInto<f64> for SwitchboardDecimal {
     type Error = ProgramError;
     fn try_into(self) -> Result<f64, ProgramError> {
-        let dec: Decimal = self.try_into().unwrap();
+        let dec: Decimal = (&self).try_into().unwrap();
         dec.to_f64()
             .ok_or(SwitchboardError::IntegerOverflowError.into())
     }
@@ -122,13 +129,13 @@ mod tests {
 
     #[test]
     fn empty_switchboard_decimal_is_false() {
-        let swb_decimal = &SwitchboardDecimal {
+        let swb_decimal = SwitchboardDecimal {
             mantissa: 0,
             scale: 0,
         };
         let b: bool = swb_decimal.into();
         assert_eq!(b, false);
-        let swb_decimal_neg = &SwitchboardDecimal {
+        let swb_decimal_neg = SwitchboardDecimal {
             mantissa: -0,
             scale: 0,
         };
@@ -139,7 +146,7 @@ mod tests {
     #[test]
     fn switchboard_decimal_to_u64() {
         // 1234.5678
-        let swb_decimal = &SwitchboardDecimal {
+        let swb_decimal = SwitchboardDecimal {
             mantissa: 12345678,
             scale: 4,
         };
@@ -150,14 +157,14 @@ mod tests {
     #[test]
     fn switchboard_decimal_to_f64() {
         // 1234.5678
-        let swb_decimal = &SwitchboardDecimal {
+        let swb_decimal = SwitchboardDecimal {
             mantissa: 12345678,
             scale: 4,
         };
         let b: f64 = swb_decimal.try_into().unwrap();
         assert_eq!(b, 1234.5678);
 
-        let swb_f64 = &SwitchboardDecimal::from_f64(1234.5678);
+        let swb_f64 = SwitchboardDecimal::from_f64(1234.5678);
         assert_eq!(swb_decimal, swb_f64);
     }
 }

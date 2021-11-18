@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+
 #[anchor_lang::error]
 pub enum SwitchboardError {
     #[msg("Aggregator is not currently populated with a valid round.")]

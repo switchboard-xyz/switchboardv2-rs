@@ -20,5 +20,5 @@ let aggregator_result: SwitchboardDecimal = switchboard_aggregator::get_aggregat
     switchboard_feed // &AccountInfo
 )?;
 
-let decimal: f64 = (&aggregator_result).try_into().unwrap();
+let decimal: f64 = aggregator_result.try_into().unwrap();
 ```
