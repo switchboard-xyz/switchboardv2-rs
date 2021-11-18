@@ -5,6 +5,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::AnchorDeserialize;
 use solana_program::pubkey::Pubkey;
 use std::cell::Ref;
+use bytemuck::{Pod, Zeroable};
 
 #[zero_copy]
 #[derive(AnchorDeserialize, Default, Debug, PartialEq, Eq)]
@@ -47,7 +48,7 @@ pub struct AggregatorRound {
     pub errors_fulfilled: [bool; 16],
 }
 
-#[account(zero_copy)]
+#[zero_copy]
 #[derive(AnchorDeserialize, Debug, PartialEq)]
 pub struct AggregatorAccountData {
     pub name: [u8; 32],
@@ -111,6 +112,8 @@ impl AggregatorAccountData {
         return [217, 230, 65, 101, 201, 162, 27, 125];
     }
 }
+unsafe impl Pod for AggregatorAccountData {}
+unsafe impl Zeroable for AggregatorAccountData {}
 
 #[cfg(test)]
 mod tests {
