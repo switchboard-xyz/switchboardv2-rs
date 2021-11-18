@@ -12,13 +12,10 @@ from a provided data feed AccountInfo.
 ## Usage
 
 ```rust
-use switchboard_aggregator::get_aggregator_result;
-use switchboard_aggregator::decimal::SwitchboardDecimal;
+use switchboard_aggregator::AggregatorAccountData;
 use std::convert::TryInto;
 
-let aggregator_result: SwitchboardDecimal = switchboard_aggregator::get_aggregator_result(
-    switchboard_feed // &AccountInfo
-)?;
+let feed_result = AggregatorAccountData::new(feed_account_info)?.get_result()?;
 
-let decimal: f64 = aggregator_result.try_into().unwrap();
+let decimal: f64 = feed_result.try_into()?;
 ```
