@@ -1,6 +1,6 @@
 [package]
 name = "switchboard-aggregator"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2018"
 description = "A Rust library to interact with Switchboard V2 data feeds."
 readme = "README.md"
