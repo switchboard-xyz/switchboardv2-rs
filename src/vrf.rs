@@ -409,10 +409,11 @@ impl VrfAccountData {
         Ok(Ref::map(data, |data| bytemuck::from_bytes(&data[8..])))
     }
 
-    pub fn get_result(self) -> Result<[u8; 32], ProgramError> {
+    pub fn get_result(&self) -> Result<[u8; 32], ProgramError> {
         Ok(self.current_round.result)
     }
 
+    // Need to log and update to actual value
     fn discriminator() -> [u8; 8] {
         return [217, 230, 65, 101, 201, 162, 27, 125];
     }
