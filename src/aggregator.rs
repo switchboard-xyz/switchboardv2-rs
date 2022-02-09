@@ -2,9 +2,9 @@
 use super::decimal::SwitchboardDecimal;
 use super::error::SwitchboardError;
 use anchor_lang::prelude::*;
+use bytemuck::{Pod, Zeroable};
 use solana_program::pubkey::Pubkey;
 use std::cell::Ref;
-use bytemuck::{Pod, Zeroable};
 
 #[zero_copy]
 #[derive(Default, Debug, PartialEq, Eq)]
