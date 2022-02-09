@@ -345,32 +345,6 @@ pub struct Callback {
     pub accounts: Vec<AccountMetaBorsh>,
     pub ix_data: Vec<u8>,
 }
-impl Into<CallbackZC> for Callback {
-    fn into(self) -> CallbackZC {
-        let mut cb: CallbackZC = Default::default();
-        cb.program_id = self.program_id;
-        cb.ix_data_len = self.ix_data.len().try_into().unwrap();
-        cb.ix_data[..self.ix_data.len()].clone_from_slice(self.ix_data.as_slice());
-        cb.accounts_len = self.accounts.len().try_into().unwrap();
-        for i in 0..self.accounts.len() {
-            cb.accounts[i] = AccountMetaZC {
-                pubkey: self.accounts[i].pubkey,
-                is_signer: self.accounts[i].is_signer,
-                is_writable: self.accounts[i].is_writable,
-            };
-        }
-        cb
-    }
-}
-impl Into<AccountMeta> for AccountMetaZC {
-    fn into(self) -> AccountMeta {
-        AccountMeta {
-            pubkey: self.pubkey,
-            is_signer: self.is_signer,
-            is_writable: self.is_writable,
-        }
-    }
-}
 
 #[zero_copy]
 pub struct VrfRound {
