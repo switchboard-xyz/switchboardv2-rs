@@ -100,7 +100,7 @@ impl AggregatorAccountData {
         Ok(Ref::map(data, |data| bytemuck::from_bytes(&data[8..])))
     }
 
-    pub fn get_result(self) -> Result<SwitchboardDecimal, ProgramError> {
+    pub fn get_result(&self) -> Result<SwitchboardDecimal, ProgramError> {
         if self.min_oracle_results > self.latest_confirmed_round.num_success {
             return Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound));
         }
