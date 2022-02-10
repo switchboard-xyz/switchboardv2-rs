@@ -1,6 +1,6 @@
-use super::error::SwitchboardError;
-#[allow(non_snake_case)]
+#![allow(non_snake_case)]
 #[allow(unaligned_references)]
+use super::error::SwitchboardError;
 use anchor_lang::prelude::*;
 use bytemuck::{Pod, Zeroable};
 use solana_program::pubkey::Pubkey;
@@ -264,12 +264,14 @@ pub struct EcvrfIntermediate {
 }
 unsafe impl Pod for EcvrfIntermediate {}
 unsafe impl Zeroable for EcvrfIntermediate {}
+#[allow(non_snake_case)]
 #[zero_copy]
 pub struct VrfBuilder {
     pub producer: Pubkey,
     pub status: VrfStatus,
     pub repr_proof: [u8; 80],
     pub proof: EcvrfProofZC,
+    #[allow(non_snake_case)]
     pub Y_point: Pubkey,
     pub stage: u32,
     pub stage1_out: EcvrfIntermediate,
@@ -415,7 +417,7 @@ impl VrfAccountData {
 
     // Need to log and update to actual value
     fn discriminator() -> [u8; 8] {
-        return [217, 230, 65, 101, 201, 162, 27, 125];
+        return [101, 35, 62, 239, 103, 151, 6, 18];
     }
 }
 unsafe impl Pod for VrfAccountData {}
