@@ -376,8 +376,8 @@ pub enum VrfStatus {
     StatusVerifyFailure,
 }
 
-// #[account(zero_copy)]
-#[derive(Copy, Clone)]
+// #[derive(Copy, Clone)]
+#[zero_copy]
 pub struct VrfAccountData {
     pub status: VrfStatus,
     pub counter: u128,
@@ -386,13 +386,18 @@ pub struct VrfAccountData {
     pub escrow: Pubkey,
     pub callback: CallbackZC,
     pub batch_size: u32,
-    pub builders: [VrfBuilder; 8],
+    pub builders: [VrfBuilder; 1],
     pub builders_len: u32,
     pub test_mode: bool,
     // pub last_verified_round: VrfRound,
     pub current_round: VrfRound,
     //
     pub _ebuf: [u8; 1024], // Buffer for future info
+}
+impl Default for VrfAccountData {
+    fn default() -> Self {
+        unsafe { std::mem::zeroed() }
+    }
 }
 
 impl VrfAccountData {
