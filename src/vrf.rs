@@ -6,16 +6,6 @@ use bytemuck::{Pod, Zeroable};
 use solana_program::pubkey::Pubkey;
 use std::cell::Ref;
 
-// #[repr(C)]
-// #[derive(Copy, Clone)]
-// pub struct EcvrfProof {
-//     pub Gamma: RistrettoPoint, //Ristretto
-//     pub c: Scalar,
-//     pub s: Scalar,
-// }
-// unsafe impl Pod for EcvrfProof {}
-// unsafe impl Zeroable for EcvrfProof {}
-
 #[zero_copy]
 pub struct EcvrfProofZC {
     pub Gamma: EdwardsPointZC, // RistrettoPoint
@@ -165,49 +155,6 @@ impl Default for EdwardsPointZC {
     }
 }
 
-// unsafe impl Pod for EdwardsPointZC {}
-// unsafe impl Zeroable for EdwardsPointZC {}
-// impl Into<EdwardsPointZC> for EdwardsPoint {
-//     fn into(self) -> EdwardsPointZC {
-//         EdwardsPointZC {
-//             X: self.X.into(),
-//             Y: self.Y.into(),
-//             Z: self.Z.into(),
-//             T: self.T.into(),
-//         }
-//     }
-// }
-// impl Into<EdwardsPoint> for EdwardsPointZC {
-//     fn into(self) -> EdwardsPoint {
-//         EdwardsPoint {
-//             X: self.X.into(),
-//             Y: self.Y.into(),
-//             Z: self.Z.into(),
-//             T: self.T.into(),
-//         }
-//     }
-// }
-// impl Into<EdwardsPointZC> for RistrettoPoint {
-//     fn into(self) -> EdwardsPointZC {
-//         EdwardsPointZC {
-//             X: self.0.X.into(),
-//             Y: self.0.Y.into(),
-//             Z: self.0.Z.into(),
-//             T: self.0.T.into(),
-//         }
-//     }
-// }
-// impl Into<RistrettoPoint> for EdwardsPointZC {
-//     fn into(self) -> RistrettoPoint {
-//         RistrettoPoint(EdwardsPoint {
-//             X: self.X.into(),
-//             Y: self.Y.into(),
-//             Z: self.Z.into(),
-//             T: self.T.into(),
-//         })
-//     }
-// }
-
 /// A `ProjectivePoint` is a point \\((X:Y:Z)\\) on the \\(\mathbb
 /// P\^2\\) model of the curve.
 /// A point \\((x,y)\\) in the affine model corresponds to
@@ -350,8 +297,6 @@ pub struct Callback {
 
 #[zero_copy]
 pub struct VrfRound {
-    // pub producer_pubkeys: [Pubkey; 16],
-    // pub producer_pubkeys_len: u32,
     pub alpha: [u8; 256],
     pub alpha_len: u32,
     pub request_slot: u64,
