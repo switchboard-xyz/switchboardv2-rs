@@ -12,4 +12,6 @@ pub enum SwitchboardError {
     IntegerOverflowError,
     #[msg("Account discriminator did not match.")]
     AccountDiscriminatorMismatch,
+    #[msg("Vrf value is empty.")]
+    VrfEmptyError,
 }

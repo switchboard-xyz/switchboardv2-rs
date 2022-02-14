@@ -211,6 +211,7 @@ pub struct EcvrfIntermediate {
 }
 unsafe impl Pod for EcvrfIntermediate {}
 unsafe impl Zeroable for EcvrfIntermediate {}
+
 #[allow(non_snake_case)]
 #[zero_copy]
 pub struct VrfBuilder {
@@ -218,7 +219,6 @@ pub struct VrfBuilder {
     pub status: VrfStatus,
     pub repr_proof: [u8; 80],
     pub proof: EcvrfProofZC,
-    #[allow(non_snake_case)]
     pub Y_point: Pubkey,
     pub stage: u32,
     pub stage1_out: EcvrfIntermediate,
@@ -331,7 +331,7 @@ pub struct VrfAccountData {
     pub escrow: Pubkey,
     pub callback: CallbackZC,
     pub batch_size: u32,
-    pub builders: [VrfBuilder; 1],
+    pub builders: [VrfBuilder; 8],
     pub builders_len: u32,
     pub test_mode: bool,
     // pub last_verified_round: VrfRound,
@@ -361,7 +361,14 @@ impl VrfAccountData {
         Ok(Ref::map(data, |data| bytemuck::from_bytes(&data[8..])))
     }
 
+    pub fn get_current_randomness_round_id(&self) -> u128 {
+        self.counter
+    }
+
     pub fn get_result(&self) -> Result<[u8; 32], ProgramError> {
+        if self.current_round.result == [0u8; 32] {
+            return Err(SwitchboardError::VrfEmptyError.into());
+        }
         Ok(self.current_round.result)
     }
 
