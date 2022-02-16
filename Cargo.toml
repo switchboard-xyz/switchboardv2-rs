@@ -10,6 +10,13 @@ repository = "https://github.com/switchboard-xyz/switchboard-aggregator"
 license = "MIT"
 documentation = "https://docs.rs/switchboard-aggregator/"
 
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "switchboard_v2"
+
+[features]
+no-entrypoint = []
+cpi = ["no-entrypoint"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
