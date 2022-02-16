@@ -423,13 +423,10 @@ impl<'info> VrfRequestRandomness<'info> {
         params: VrfRequestRandomnessParams,
     ) -> Result<Instruction, ProgramError> {
         let accounts = self.to_account_metas(None);
-        msg!("account_metas len {:?}", accounts.len());
 
         let mut data: Vec<u8> = VrfRequestRandomness::discriminator().try_to_vec()?;
         let mut param_vec: Vec<u8> = params.try_to_vec()?;
         data.append(&mut param_vec);
-
-        msg!("ixData {:?}", data);
 
         let instruction = Instruction::new_with_bytes(program_id, &data, accounts);
         Ok(instruction)
@@ -447,9 +444,7 @@ impl<'info> VrfRequestRandomness<'info> {
         };
         let instruction = self.get_instruction(program.key.clone(), cpi_params)?;
         let account_infos = self.to_account_infos();
-        msg!("account_infos len {:?}", account_infos.len());
 
-        msg!("invoking CPI");
         invoke(&instruction, &account_infos[..])
     }
 
