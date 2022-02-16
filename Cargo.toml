@@ -21,7 +21,7 @@ cpi = ["no-entrypoint"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anchor-lang = "0.18.0"
+anchor-lang = "0.19.0"
 borsh = { version = "0.9.1", features = ["const-generics"] }
 rust_decimal = { version = "1.15.0" }
 solana-program = "1.8.2"
