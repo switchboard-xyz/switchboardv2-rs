@@ -5,3 +5,5 @@ pub mod vrf;
 
 pub use aggregator::AggregatorAccountData;
 pub use vrf::VrfAccountData;
+
+pub use vrf::VrfRequestRandomness;
