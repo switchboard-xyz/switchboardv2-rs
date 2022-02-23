@@ -432,7 +432,7 @@ impl<'info> VrfRequestRandomness<'info> {
         Ok(instruction)
     }
 
-    pub fn request_randomness(
+    pub fn invoke(
         &self,
         program: AccountInfo<'info>,
         state_bump: u8,
