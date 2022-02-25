@@ -1,11 +1,12 @@
 #![allow(non_snake_case)]
-#[allow(unaligned_references)]
 use super::error::SwitchboardError;
+#[allow(unaligned_references)]
+use crate::*;
 use anchor_lang::prelude::*;
 use bytemuck::{Pod, Zeroable};
 use solana_program::entrypoint::ProgramResult;
 use solana_program::instruction::Instruction;
-use solana_program::program::invoke;
+use solana_program::program::{invoke, invoke_signed};
 use solana_program::pubkey::Pubkey;
 use std::cell::Ref;
 
@@ -394,18 +395,28 @@ pub struct VrfRequestRandomness<'info> {
     pub oracle_queue: AccountInfo<'info>,
     pub queue_authority: AccountInfo<'info>,
     pub data_buffer: AccountInfo<'info>,
-    #[account(mut)]
+    #[account(mut, 
+        seeds = [
+            b"PermissionAccountData",
+            queue_authority.key().as_ref(),
+            oracle_queue.key().as_ref(),
+            vrf.key().as_ref()
+        ],
+        bump = params.permission_bump
+    )]
     pub permission: AccountInfo<'info>,
-    #[account(mut)]
-    pub escrow: AccountInfo<'info>,
-    #[account(mut)]
-    pub payer_wallet: AccountInfo<'info>,
+    #[account(mut, constraint = escrow.owner == program_state.key())]
+    pub escrow: Account<'info, TokenAccount>,
+    #[account(mut, constraint = payer_wallet.owner == payer_authority.key())]
+    pub payer_wallet: Account<'info, TokenAccount>,
     #[account(signer)]
     pub payer_authority: AccountInfo<'info>,
     pub recent_blockhashes: AccountInfo<'info>,
+    #[account(seeds = [b"STATE"], bump = params.state_bump)]
     pub program_state: AccountInfo<'info>,
     pub token_program: AccountInfo<'info>,
 }
+
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct VrfRequestRandomnessParams {
     pub permission_bump: u8,
@@ -439,13 +450,30 @@ impl<'info> VrfRequestRandomness<'info> {
         permission_bump: u8,
     ) -> ProgramResult {
         let cpi_params = VrfRequestRandomnessParams {
-            state_bump: state_bump,
             permission_bump: permission_bump,
+            state_bump: state_bump,
         };
         let instruction = self.get_instruction(program.key.clone(), cpi_params)?;
         let account_infos = self.to_account_infos();
 
         invoke(&instruction, &account_infos[..])
+    }
+
+    pub fn invoke_signed(
+        &self,
+        program: AccountInfo<'info>,
+        state_bump: u8,
+        permission_bump: u8,
+        signer_seeds: &[&[&[u8]]],
+    ) -> ProgramResult {
+        let cpi_params = VrfRequestRandomnessParams {
+            permission_bump: permission_bump,
+            state_bump: state_bump,
+        };
+        let instruction = self.get_instruction(program.key.clone(), cpi_params)?;
+        let account_infos = self.to_account_infos();
+
+        invoke_signed(&instruction, &account_infos[..], signer_seeds)
     }
 
     fn to_account_infos(&self) -> Vec<AccountInfo<'info>> {
@@ -456,8 +484,8 @@ impl<'info> VrfRequestRandomness<'info> {
             self.queue_authority.clone(),
             self.data_buffer.clone(),
             self.permission.clone(),
-            self.escrow.clone(),
-            self.payer_wallet.clone(),
+            self.escrow.to_account_info().clone(),
+            self.payer_wallet.to_account_info().clone(),
             self.payer_authority.clone(),
             self.recent_blockhashes.clone(),
             self.program_state.clone(),
@@ -469,7 +497,7 @@ impl<'info> VrfRequestRandomness<'info> {
         return vec![
             AccountMeta {
                 pubkey: self.authority.key.clone(),
-                is_signer: self.authority.is_signer,
+                is_signer: true, // overwrite, authority has to sign
                 is_writable: self.authority.is_writable,
             },
             AccountMeta {
@@ -498,14 +526,14 @@ impl<'info> VrfRequestRandomness<'info> {
                 is_writable: self.permission.is_writable,
             },
             AccountMeta {
-                pubkey: self.escrow.key.clone(),
-                is_signer: self.escrow.is_signer,
-                is_writable: self.escrow.is_writable,
+                pubkey: self.escrow.to_account_info().key.clone(),
+                is_signer: self.escrow.to_account_info().is_signer,
+                is_writable: self.escrow.to_account_info().is_writable,
             },
             AccountMeta {
-                pubkey: self.payer_wallet.key.clone(),
-                is_signer: self.payer_wallet.is_signer,
-                is_writable: self.payer_wallet.is_writable,
+                pubkey: self.payer_wallet.to_account_info().key.clone(),
+                is_signer: self.payer_wallet.to_account_info().is_signer,
+                is_writable: self.payer_wallet.to_account_info().is_writable,
             },
             AccountMeta {
                 pubkey: self.payer_authority.key.clone(),

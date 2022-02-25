@@ -23,6 +23,7 @@ cpi = ["no-entrypoint"]
 
 [dependencies]
 anchor-lang = "0.19.0"
+anchor-spl = "0.19.0"
 borsh = { version = "0.9.1", features = ["const-generics"] }
 rust_decimal = { version = "1.15.0" }
 solana-program = "1.8.2"
