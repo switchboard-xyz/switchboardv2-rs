@@ -49,14 +49,14 @@ impl<'a> AggregatorHistoryBuffer<'a> {
         let lower = &self.rows[..self.insertion_idx + 1];
         let lahr = lower.lower_bound_by(|x| x.timestamp.cmp(&timestamp));
         if lahr != 0 {
-            return Some(self.rows[lahr - 1]);
+            return Some(lower[lahr - 1]);
         }
         if self.insertion_idx + 1 < self.rows.len() &&
             self.rows[self.insertion_idx + 1].timestamp != 0 {
             let upper = &self.rows[self.insertion_idx + 1..];
             let uahr = upper.lower_bound_by(|x| x.timestamp.cmp(&timestamp));
             if uahr != 0 {
-                return Some(self.rows[uahr - 1]);
+                return Some(upper[uahr - 1]);
             }
         }
         None
