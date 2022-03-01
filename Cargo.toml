@@ -28,3 +28,4 @@ borsh = { version = "0.9.1", features = ["const-generics"] }
 rust_decimal = { version = "1.15.0" }
 solana-program = "1.8.2"
 bytemuck = "1.7.2"
+superslice = "1"
