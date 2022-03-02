@@ -7,12 +7,14 @@ use solana_program::pubkey::Pubkey;
 use std::cell::Ref;
 
 #[zero_copy]
+#[repr(packed)]
 #[derive(Default, Debug, PartialEq, Eq)]
 pub struct Hash {
     pub data: [u8; 32],
 }
 
 #[zero_copy]
+#[repr(packed)]
 #[derive(Default, Debug, PartialEq, Eq)]
 pub struct AggregatorRound {
     // Maintains the number of successful responses received from nodes.
@@ -48,6 +50,7 @@ pub struct AggregatorRound {
 }
 
 #[zero_copy]
+#[repr(packed)]
 #[derive(Debug, PartialEq)]
 pub struct AggregatorAccountData {
     pub name: [u8; 32],
@@ -87,7 +90,7 @@ pub struct AggregatorAccountData {
 impl AggregatorAccountData {
     pub fn new<'info>(
         switchboard_feed: &'info AccountInfo,
-    ) -> Result<Ref<'info, AggregatorAccountData>, ProgramError> {
+    ) -> anchor_lang::Result<Ref<'info, AggregatorAccountData>> {
         let data = switchboard_feed.try_borrow_data()?;
 
         let mut disc_bytes = [0u8; 8];
@@ -100,9 +103,9 @@ impl AggregatorAccountData {
         Ok(Ref::map(data, |data| bytemuck::from_bytes(&data[8..])))
     }
 
-    pub fn get_result(&self) -> Result<SwitchboardDecimal, ProgramError> {
+    pub fn get_result(&self) -> anchor_lang::Result<SwitchboardDecimal> {
         if self.min_oracle_results > self.latest_confirmed_round.num_success {
-            return Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound));
+            return Err(SwitchboardError::InvalidAggregatorRound.into());
         }
         Ok(self.latest_confirmed_round.result)
     }
@@ -154,20 +157,21 @@ mod tests {
     #[test]
     fn test_reject_current_on_sucess_count() {
         let lastest_round = create_round(100.0, 5, 0); // num success 30 < 10 min oracle result
-
         let aggregator = create_aggregator(lastest_round.clone());
-        assert_eq!(
-            aggregator.get_result(),
-            Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound))
+
+        assert!(
+            aggregator.get_result().is_err(),
+            "Aggregator is not currently populated with a valid round."
         );
     }
 
     #[test]
     fn test_no_valid_aggregator_result() {
         let aggregator = create_aggregator(AggregatorRound::default());
-        assert_eq!(
-            aggregator.get_result(),
-            Err(ProgramError::from(SwitchboardError::InvalidAggregatorRound))
+
+        assert!(
+            aggregator.get_result().is_err(),
+            "Aggregator is not currently populated with a valid round."
         );
     }
 }

@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 
-#[anchor_lang::error]
+#[error_code]
+#[derive(Eq, PartialEq)]
 pub enum SwitchboardError {
     #[msg("Aggregator is not currently populated with a valid round.")]
     InvalidAggregatorRound,
@@ -14,4 +15,8 @@ pub enum SwitchboardError {
     AccountDiscriminatorMismatch,
     #[msg("Vrf value is empty.")]
     VrfEmptyError,
+    #[msg("Failed to send requestRandomness instruction")]
+    VrfCpiError,
+    #[msg("Failed to send signed requestRandomness instruction")]
+    VrfCpiSignedError,
 }

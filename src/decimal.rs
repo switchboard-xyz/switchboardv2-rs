@@ -1,13 +1,12 @@
 use super::error::SwitchboardError;
 use anchor_lang::prelude::*;
 use core::cmp::Ordering;
-use core::result::Result;
 use rust_decimal::prelude::{FromPrimitive, ToPrimitive};
 use rust_decimal::Decimal;
-use solana_program::program_error::ProgramError;
 use std::convert::{From, TryInto};
 
 #[zero_copy]
+#[repr(packed)]
 #[derive(Default, Debug, Eq, PartialEq)]
 pub struct SwitchboardDecimal {
     pub mantissa: i128,
@@ -27,18 +26,18 @@ impl SwitchboardDecimal {
     }
 }
 impl TryInto<Decimal> for &SwitchboardDecimal {
-    type Error = ProgramError;
-    fn try_into(self) -> Result<Decimal, ProgramError> {
+    type Error = anchor_lang::error::Error;
+    fn try_into(self) -> anchor_lang::Result<Decimal> {
         Decimal::try_from_i128_with_scale(self.mantissa, self.scale)
-            .map_err(|_| SwitchboardError::DecimalConversionError.into())
+            .map_err(|_| error!(SwitchboardError::DecimalConversionError))
     }
 }
 
 impl TryInto<Decimal> for SwitchboardDecimal {
-    type Error = ProgramError;
-    fn try_into(self) -> Result<Decimal, ProgramError> {
+    type Error = anchor_lang::error::Error;
+    fn try_into(self) -> anchor_lang::Result<Decimal> {
         Decimal::try_from_i128_with_scale(self.mantissa, self.scale)
-            .map_err(|_| SwitchboardError::DecimalConversionError.into())
+            .map_err(|_| error!(SwitchboardError::DecimalConversionError))
     }
 }
 
@@ -86,29 +85,29 @@ impl From<SwitchboardDecimal> for bool {
 }
 
 impl TryInto<u64> for SwitchboardDecimal {
-    type Error = ProgramError;
-    fn try_into(self) -> Result<u64, ProgramError> {
+    type Error = anchor_lang::error::Error;
+    fn try_into(self) -> anchor_lang::Result<u64> {
         let dec: Decimal = (&self).try_into().unwrap();
         dec.to_u64()
-            .ok_or(SwitchboardError::IntegerOverflowError.into())
+            .ok_or(error!(SwitchboardError::IntegerOverflowError))
     }
 }
 
 impl TryInto<i64> for SwitchboardDecimal {
-    type Error = ProgramError;
-    fn try_into(self) -> Result<i64, ProgramError> {
+    type Error = anchor_lang::error::Error;
+    fn try_into(self) -> anchor_lang::Result<i64> {
         let dec: Decimal = (&self).try_into().unwrap();
         dec.to_i64()
-            .ok_or(SwitchboardError::IntegerOverflowError.into())
+            .ok_or(error!(SwitchboardError::IntegerOverflowError))
     }
 }
 
 impl TryInto<f64> for SwitchboardDecimal {
-    type Error = ProgramError;
-    fn try_into(self) -> Result<f64, ProgramError> {
+    type Error = anchor_lang::error::Error;
+    fn try_into(self) -> anchor_lang::Result<f64> {
         let dec: Decimal = (&self).try_into().unwrap();
         dec.to_f64()
-            .ok_or(SwitchboardError::IntegerOverflowError.into())
+            .ok_or(error!(SwitchboardError::IntegerOverflowError))
     }
 }
 
