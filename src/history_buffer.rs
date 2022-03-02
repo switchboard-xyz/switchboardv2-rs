@@ -1,10 +1,10 @@
 use super::decimal::SwitchboardDecimal;
 use super::error::SwitchboardError;
 #[allow(unaligned_references)]
-use crate::*;
 use anchor_lang::prelude::*;
 use bytemuck::{try_cast_slice, try_from_bytes};
 use bytemuck::{Pod, Zeroable};
+use solana_program::account_info::AccountInfo;
 use solana_program::pubkey::Pubkey;
 use std::cell::Ref;
 use std::cell::RefCell;
@@ -43,21 +43,28 @@ impl<'a> AggregatorHistoryBuffer<'a> {
         });
     }
 
-    // TODO: Need to fix case where timestamp requested equals a row timestamp
+    /// return the previous row in the history buffer for a given timestamp
     pub fn lower_bound(&self, timestamp: i64) -> Option<AggregatorHistoryRow> {
         if self.rows[self.insertion_idx].timestamp == 0 {
             return None;
         }
         let lower = &self.rows[..self.insertion_idx + 1];
         let lahr = lower.lower_bound_by(|x| x.timestamp.cmp(&timestamp));
+        if lahr < lower.len() && lower[lahr].timestamp == timestamp {
+            return Some(lower[lahr]);
+        }
         if lahr != 0 {
             return Some(lower[lahr - 1]);
         }
+
         if self.insertion_idx + 1 < self.rows.len()
             && self.rows[self.insertion_idx + 1].timestamp != 0
         {
             let upper = &self.rows[self.insertion_idx + 1..];
             let uahr = upper.lower_bound_by(|x| x.timestamp.cmp(&timestamp));
+            if uahr < upper.len() && upper[uahr].timestamp == timestamp {
+                return Some(upper[uahr]);
+            }
             if uahr != 0 {
                 return Some(upper[uahr - 1]);
             }
@@ -69,12 +76,16 @@ impl<'a> AggregatorHistoryBuffer<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::*;
     impl<'info, 'a> Default for AggregatorHistoryBuffer<'a> {
         fn default() -> Self {
             unsafe { std::mem::zeroed() }
         }
     }
 
+    // insertion_idx = 1
+    // 1646249940   - 100.6022611525
+    // 1646249949   - 100.5200735
     // 1646249713   - 100.3012875
     // 1646249752   - 100.495469495
     // 1646249881   - 100.5763445
@@ -83,8 +94,7 @@ mod tests {
     // 1646249911   - 100.5026458225
     // 1646249918   - 100.52034706
     // 1646249929   - 100.6000855
-    // 1646249940   - 100.6022611525
-    // 1646249949   - 100.5200735
+
     const HISTORY_BUFFER_DATA: [u8; 292] = [
         66, 85, 70, 70, 69, 82, 120, 120, 1, 0, 0, 0, 212, 199, 31, 98, 0, 0, 0, 0, 69, 210, 158,
         59, 234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 221, 199, 31, 98, 0, 0, 0, 0, 95,
@@ -121,16 +131,52 @@ mod tests {
             0,
         );
         let history_buffer = AggregatorHistoryBuffer::new(&history_account_info).unwrap();
-        let mut counter = 0;
-        for row in history_buffer.rows.iter() {
-            let val: f64 = row.value.try_into().unwrap();
-            println!(
-                "[{}] {} - {:?} = {}",
-                counter, row.timestamp, row.value, val
-            );
-            counter = counter + 1;
-        }
 
+        // let mut counter = 0;
+        // for row in history_buffer.rows.iter() {
+        //     let val: f64 = row.value.try_into().unwrap();
+        //     println!(
+        //         "[{}] {} - {:?} = {}",
+        //         counter, row.timestamp, row.value, val
+        //     );
+        //     counter = counter + 1;
+        // }
+
+        // Get result at exact timestamp, lower bound
+        match history_buffer.lower_bound(1646249940) {
+            None => panic!("failed to retrieve a value for a valid timestamp"),
+            Some(row) => {
+                let correct_value = SwitchboardDecimal {
+                    mantissa: 1006022611525,
+                    scale: 10,
+                };
+                if row.value != correct_value {
+                    panic!(
+                        "failed to retrieve correct value at exact timestamp 1646249940. received: {:?}, expected: {:?}",
+                        row.value, correct_value
+                    )
+                }
+            }
+        };
+
+        // Get result at exact timestamp, lower bound
+        match history_buffer.lower_bound(1646249949) {
+            None => panic!("failed to retrieve a value for a valid timestamp"),
+            Some(row) => {
+                let correct_value = SwitchboardDecimal {
+                    mantissa: 1005200735,
+                    scale: 7,
+                };
+                if row.value != correct_value {
+                    panic!(
+                        "failed to retrieve correct value at exact timestamp 1646249940. received: {:?}, expected: {:?}",
+                        row.value, correct_value
+                    )
+                }
+            }
+        };
+
+        // Get result at exact timestamp, upper bound
         match history_buffer.lower_bound(1646249911) {
             None => panic!("failed to retrieve a value for a valid timestamp"),
             Some(row) => {
@@ -140,11 +186,79 @@ mod tests {
                 };
                 if row.value != correct_value {
                     panic!(
-                        "failed to retrieve correct value for a timestamp. received: {:?}, expected: {:?}",
+                        "failed to retrieve correct value at exact timestamp 1646249911. received: {:?}, expected: {:?}",
                         row.value, correct_value
                     )
                 }
             }
+        };
+
+        // Get result at exact timestamp, upper bound
+        match history_buffer.lower_bound(1646249929) {
+            None => panic!("failed to retrieve a value for a valid timestamp"),
+            Some(row) => {
+                let correct_value = SwitchboardDecimal {
+                    mantissa: 1006000855,
+                    scale: 7,
+                };
+                if row.value != correct_value {
+                    panic!(
+                        "failed to retrieve correct value at exact timestamp 1646249911. received: {:?}, expected: {:?}",
+                        row.value, correct_value
+                    )
+                }
+            }
+        };
+
+        // Get lower bound result
+        match history_buffer.lower_bound(1646249912) {
+            None => panic!("failed to retrieve a value for a valid timestamp"),
+            Some(row) => {
+                let correct_value = SwitchboardDecimal {
+                    mantissa: 1005026458225,
+                    scale: 10,
+                };
+                if row.value != correct_value {
+                    panic!("failed to retrieve correct value for timestamp 1646249912. received: {:?}, expected: {:?}",row.value, correct_value)
+                }
+            }
+        };
+
+        // Get previous result
+        match history_buffer.lower_bound(1646249910) {
+            None => panic!("failed to retrieve a value for a valid timestamp"),
+            Some(row) => {
+                let correct_value = SwitchboardDecimal {
+                    mantissa: 100517196115,
+                    scale: 9,
+                };
+                if row.value != correct_value {
+                    panic!(
+                        "failed to retrieve correct value for timestamp 1646249910. received: {:?}, expected: {:?}",
+                        row.value, correct_value
+                    )
+                }
+            }
+        };
+
+        // Get future result
+        match history_buffer.lower_bound(2646249911) {
+            None => panic!("failed to retrieve a value for a valid timestamp"),
+            Some(row) => {
+                let correct_value = SwitchboardDecimal {
+                    mantissa: 1005200735,
+                    scale: 7,
+                };
+                if row.value != correct_value {
+                    panic!("failed to retrieve correct value for timestamp 2646249911. received: {:?}, expected: {:?}",row.value, correct_value)
+                }
+            }
+        };
+
+        // Get past result
+        match history_buffer.lower_bound(0646249911) {
+            None => (),
+            Some(row) => panic!("retrieved row when no value was expected {:?}", row.value),
         };
     }
 }
