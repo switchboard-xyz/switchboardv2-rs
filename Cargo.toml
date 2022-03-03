@@ -6,7 +6,7 @@ description = "A Rust library to interact with Switchboard V2 data feeds."
 readme = "README.md"
 keywords = ["switchboard", "oracle", "solana"]
 homepage = "https://switchboard.xyz"
-repository = "https://github.com/switchboard-xyz/switchboard-aggregator"
+repository = "https://github.com/switchboard-xyz/switchboardv2-rs"
 license = "MIT"
 documentation = "https://docs.rs/switchboard-v2/"
 
