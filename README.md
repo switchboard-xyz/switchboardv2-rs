@@ -22,6 +22,17 @@ let feed_result = AggregatorAccountData::new(feed_account_info)?.get_result()?;
 let decimal: f64 = feed_result.try_into()?;
 ```
 
+### Aggregator History
+
+```rust
+use switchboard_v2::AggregatorHistoryBuffer;
+use std::convert::TryInto;
+
+let history_buffer = AggregatorHistoryBuffer::new(history_account_info)?;
+let current_timestamp = Clock::get()?.unix_timestamp;
+let one_hour_ago: f64 = history_buffer.lower_bound(current_timestamp - 3600).unwrap().try_into()?;
+```
+
 ### VRF Account
 
 ```rust
@@ -29,11 +40,6 @@ use switchboard_v2::VrfAccountData;
 
 let vrf = VrfAccountData::new(vrf_account_info)?;
 let result_buffer = vrf.get_result()?;
-if result_buffer == [0u8; 32] {
-    msg!("vrf buffer empty");
-    return Ok(());
-}
-
 let value: &[u128] = bytemuck::cast_slice(&result_buffer[..]);
 let result = value[0] % 256000 as u128;
 ```
